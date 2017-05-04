@@ -3,7 +3,7 @@ test your agent's strength against a set of known agents using tournament.py
 and include the results in your report.
 """
 import random
-
+import math
 
 class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
@@ -35,7 +35,21 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_winner(player): # check to see if player is in state winner
+        print("You win!")
+        return math.inf # abstraction of score, +inf equates to a win
+    elif game.is_loser(player):
+        print("You lose!")
+        return -math.inf # abstraction of score, -inf equates to a loss
+
+    opponent = game.get_opponent(player) # get the current opponent of the player
+    opp_moves = len(game.get_legal_moves(opponent)) # number of legal moves that opponent can do
+
+    my_moves = len(game.get_legal_moves(player)) # number of moves available to player
+
+    result_moves = float(my_moves - opp_moves) # amount of moves available whilst reducing the opponents choice
+
+    return result_moves
 
 
 def custom_score_2(game, player):
