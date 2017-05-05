@@ -124,7 +124,25 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_winner(player):  # check to see if player is in state winner
+        print("You win!")
+        return math.inf  # abstraction of score, +inf equates to a win
+    elif game.is_loser(player):
+        print("You lose!")
+        return -math.inf  # abstraction of score, -inf equates to a loss
+
+    remaining_spaces = len(game.get_blank_spaces())  # gets the number of remaining spaces on the board
+    opponent = game.get_opponent(player)  # get current opponent of player
+
+    legal_moves = len(game.get_legal_moves(player))  # no. of legal moves available to player
+    legal_opp_moves = len(game.get_legal_moves(opponent))  # no. of legal moves available to the opponent
+
+    my_remaining_spaces = legal_moves * 2 - legal_opp_moves
+    # doubles the agents moves, giving a higher return on amount of moves that should aggressively maximise their score
+    # but also reduces the opponent's score
+    result_moves = my_remaining_spaces/remaining_spaces # uses the length of the game to work out no. of best moves
+
+    return float(result_moves)
 
 
 class IsolationPlayer:
