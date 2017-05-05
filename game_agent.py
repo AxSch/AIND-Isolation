@@ -75,7 +75,30 @@ def custom_score_2(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_winner(player): # check to see if player is in state winner
+        print("You win!")
+        return math.inf  # abstraction of score, +inf equates to a win
+    elif game.is_loser(player):
+        print("You lose!")
+        return -math.inf  # abstraction of score, -inf equates to a loss
+
+    empty_spaces = len(game.get_blank_spaces())  # gets the number of empty spaces on the board
+
+    legal_moves = len(game.get_legal_moves(player))  # no. of legal moves available to player
+    my_longestPath = empty_spaces - legal_moves
+    # returns the longest path for the player
+
+    opponent = game.get_opponent(player)  # get current opponent of player
+    legal_opp_moves = len(game.get_legal_moves(opponent))  # no. of legal moves available to the opponent
+    opp_longestPath = empty_spaces - legal_opp_moves
+    # returns the longest path for the opponent
+
+
+    if my_longestPath > opp_longestPath:
+        # check to see if player's area is larger than the opponent's
+        return float(my_longestPath)  # if true then return the length
+    else:
+        return float(0)
 
 
 def custom_score_3(game, player):
