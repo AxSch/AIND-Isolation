@@ -268,7 +268,39 @@ class MinimaxPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         # TODO: finish this function!
-        raise NotImplementedError
+        #raise NotImplementedError
+
+        legal_moves = game.get_legal_moves()  # retrieves all available moves, ACTIONs agent can take
+
+        def max_value(self, game, depth):
+            """
+             Helper function for searching for the best maximising move
+            """
+            if depth == 0:  # Terminal test, checks base case
+                return self.score(game)
+            best_move = -math.inf  # abstraction assignment for lowest available score
+            for m in legal_moves:  # iterate through all available actions
+                new_state = game.forecast_move(m)  # for each move available forecast the result of that move, RESULT
+                score = self.min_value(new_state, depth - 1)
+                # recursively call helper function min_value to find minimising move using the new game state
+                # and subtract 1 from depth since the depth of the minimax tree has decreased
+                best_move = max(best_move, score)  # calculate best available maximising move
+            return best_move
+
+        def min_value(self, game, depth):
+            """
+             Helper function for searching for the best minimising move
+            """
+            if depth == 0:  # Terminal test, checks base case
+                return self.score(game)
+            best_move = math.inf  # abstraction assignment for highest available score
+            for m in legal_moves:  # iterate through all available actions
+                new_state = game.forecast_move(m)  # for each move available forecast the result of that move, RESULT
+                score = self.max_value(new_state, depth - 1)
+                # recursively call helper function max_value to find maximising move using the new game state
+                # and subtract 1 from depth since the depth of the minimax tree has decreased
+                best_move = min(best_move, score)  # calculate best available minimising move
+            return best_move
 
 
 class AlphaBetaPlayer(IsolationPlayer):
