@@ -318,7 +318,6 @@ class MinimaxPlayer(IsolationPlayer):
         return best_score  # propagates minimizing score for given state
 
 
-
 class AlphaBetaPlayer(IsolationPlayer):
     """Game-playing agent that chooses a move using iterative deepening minimax
     search with alpha-beta pruning. You must finish and test this player to
@@ -409,4 +408,64 @@ class AlphaBetaPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         # TODO: finish this function!
-        raise NotImplementedError
+        # raise NotImplementedError
+        legal_moves = game.get_legal_moves()
+        best_move = (-1,-1)
+
+        for m in legal_moves:
+            new_state = game.forecast_move(m)
+            score = new_state # will have to implement min, then test alpha and beta
+            best_score = -math.inf
+            #if score > best_score:
+                #best_move = m
+                #best_score = score
+        return m
+
+    def max_value(self, game, depth, alpha, beta):
+        """
+        Helper function for calculating the upper boundary, alpha to use for pruning
+        """
+        if self.time_left() < self.TIMER_THRESHOLD:  # Timeout check
+            raise SearchTimeout()
+
+        if game.is_loser(self) or game.is_winner(self) or depth == 0:  # Terminal test, checks base cases
+            return self.score(game,self)  # returns the score, UTILITY of the current state
+
+        legal_moves = game.get_legal_moves()
+        best_score = -math.inf
+
+        for m in legal_moves:
+            new_state = game.forecast_move(m)
+            best_score = m  # recursive call to min - using newstate, alpha and beta
+            if best_score >= beta:
+                return best_score
+            else:
+                alpha = max(alpha,best_score)
+        return best_score
+
+    def min_value(self, game, depth, alpha, beta):
+        """
+        Helper function for calculating the lower boundary, alpha to use for pruning
+        """
+        if self.time_left() < self.TIMER_THRESHOLD:  # Timeout check
+            raise SearchTimeout()
+
+        if game.is_loser(self) or game.is_winner(self) or depth == 0:  # Terminal test, checks base cases
+            return self.score(game,self)  # returns the score, UTILITY of the current state
+
+        legal_moves = game.get_legal_moves()
+        best_score = -math.inf
+
+        for m in legal_moves:
+            new_state = game.forecast_move(m)
+            best_score = m  # recursive call to min - using newstate, alpha and beta
+            if best_score <= alpha:
+                return best_score
+            else:
+                beta = min(beta,best_score)
+        return best_score
+
+
+
+
+
