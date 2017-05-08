@@ -266,41 +266,57 @@ class MinimaxPlayer(IsolationPlayer):
         """
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
-
         # TODO: finish this function!
-        #raise NotImplementedError
+        # raise NotImplementedError
 
-        legal_moves = game.get_legal_moves()  # retrieves all available moves, ACTIONs agent can take
+        legal_moves = game.get_legal_moves()  # obtain legal moves available to the board
+        best_move = (-1,-1)  # initialisation of best move
+        best_score = -math.inf  # abstraction of infinite
 
-        def max_value(self, game, depth):
-            """
-             Helper function for searching for the best maximising move
-            """
-            if depth == 0:  # Terminal test, checks base case
-                return self.score(game)
-            best_move = -math.inf  # abstraction assignment for lowest available score
-            for m in legal_moves:  # iterate through all available actions
-                new_state = game.forecast_move(m)  # for each move available forecast the result of that move, RESULT
-                score = self.min_value(new_state, depth - 1)
-                # recursively call helper function min_value to find minimising move using the new game state
-                # and subtract 1 from depth since the depth of the minimax tree has decreased
-                best_move = max(best_move, score)  # calculate best available maximising move
-            return best_move
+        for m in legal_moves:  # for each ACTION, create a new state for its outcome, RESULT
+            new_state = game.forecast_move(m)
+            score = self.min_value(new_state, depth - 1)  # recursion to calculate the score of that state
+            if score > best_score:
+                best_move = m
+                best_score = score
+        return best_move
 
-        def min_value(self, game, depth):
-            """
-             Helper function for searching for the best minimising move
-            """
-            if depth == 0:  # Terminal test, checks base case
-                return self.score(game)
-            best_move = math.inf  # abstraction assignment for highest available score
-            for m in legal_moves:  # iterate through all available actions
-                new_state = game.forecast_move(m)  # for each move available forecast the result of that move, RESULT
-                score = self.max_value(new_state, depth - 1)
-                # recursively call helper function max_value to find maximising move using the new game state
-                # and subtract 1 from depth since the depth of the minimax tree has decreased
-                best_move = min(best_move, score)  # calculate best available minimising move
-            return best_move
+    def min_value(self, game, depth):
+        """
+        Helper function for calculating the minimising score
+        """
+        if self.time_left() < self.TIMER_THRESHOLD:  # Timeout check
+            raise SearchTimeout()
+
+        if game.is_loser(self) or game.is_winner(self) or depth == 0:  # Terminal test, checks base cases
+            return self.score(game,self)  # returns the score, UTILITY of the current state
+        legal_moves = game.get_legal_moves()  # obtain all legal moves for game, ACTIONs that can be taken
+        best_score = math.inf  # abstraction assignment of infinite(highest possible value for MIN score)
+        for m in legal_moves:  # iterate through all available actions
+            new_state = game.forecast_move(m)  # for each available move, forecast the resulting state from that ACTION
+            # RESULT of ACTION
+            score = self.max_value(new_state, depth - 1)  # recursively uses the new state
+            best_score = min(best_score,score)  # calculates the minimizing score between the states
+        return best_score  # propagates minimizing score for given state
+
+    def max_value(self, game, depth):
+        """
+        Helper function for calculating the maximising score
+        """
+        if self.time_left() < self.TIMER_THRESHOLD:   # Timeout check
+            raise SearchTimeout()
+
+        if game.is_loser(self) or game.is_winner(self) or depth == 0:  # Terminal test, checks base cases
+            return self.score(game,self)  # returns the score, UTILITY of the current state
+        legal_moves = game.get_legal_moves()  # obtain all legal moves for game, ACTIONs that can be taken
+        best_score = -math.inf  # abstraction assignment of neg. infinite(lowest possible value for MAX score)
+        for m in legal_moves:  # iterate through all available actions
+            new_state = game.forecast_move(m)  # for each available move, forecast the resulting state from that ACTION
+            # RESULT of ACTION
+            score = self.max_value(new_state, depth - 1)  # recursively uses the new state
+            best_score = max(best_score,score)  # calculates the minimizing score between the states
+        return best_score  # propagates minimizing score for given state
+
 
 
 class AlphaBetaPlayer(IsolationPlayer):
