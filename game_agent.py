@@ -365,16 +365,12 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         try:
             depth = 0  # initialisation of depth
-            cutoff = 4
-            while game.is_loser(self) is not True or game.is_winner(self) is not True:
+            while True:
                 # runs along as game is still active
-                depth += 1
-                best_move = self.alphabeta(game, depth)
-                if depth != cutoff:
-                    return best_move
-            return best_move
+                depth += 1  # increment depth after each search
+                best_move = self.alphabeta(game, depth)  # apply alpha beta to search
 
-        except SearchTimeout:
+        except SearchTimeout:  # cutoff - when timer runs out
             pass  # Handle any actions required after timeout as needed
             # Failure
 
