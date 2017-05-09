@@ -271,7 +271,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         legal_moves = game.get_legal_moves()  # obtain legal moves available to the board
         best_move = (-1,-1)  # initialisation of best move
-        best_score = -math.inf  # abstraction of infinite
+        best_score = -math.inf  # abstraction of infinity
 
         for m in legal_moves:  # for each ACTION, create a new state for its outcome, RESULT
             new_state = game.forecast_move(m)
@@ -291,7 +291,7 @@ class MinimaxPlayer(IsolationPlayer):
         if game.is_loser(self) or game.is_winner(self) or depth == 0:  # Terminal test, checks base cases
             return self.score(game,self)  # returns the score, UTILITY of the current state
         legal_moves = game.get_legal_moves()  # obtain all legal moves for game, ACTIONs that can be taken
-        best_score = math.inf  # abstraction assignment of infinite(highest possible value for MIN score)
+        best_score = math.inf  # abstraction assignment of infinity(highest possible value for MIN score)
         for m in legal_moves:  # iterate through all available actions
             new_state = game.forecast_move(m)  # for each available move, forecast the resulting state from that ACTION
             # RESULT of ACTION
@@ -309,7 +309,7 @@ class MinimaxPlayer(IsolationPlayer):
         if game.is_loser(self) or game.is_winner(self) or depth == 0:  # Terminal test, checks base cases
             return self.score(game,self)  # returns the score, UTILITY of the current state
         legal_moves = game.get_legal_moves()  # obtain all legal moves for game, ACTIONs that can be taken
-        best_score = -math.inf  # abstraction assignment of neg. infinite(lowest possible value for MAX score)
+        best_score = -math.inf  # abstraction assignment of neg. infinity(lowest possible value for MAX score)
         for m in legal_moves:  # iterate through all available actions
             new_state = game.forecast_move(m)  # for each available move, forecast the resulting state from that ACTION
             # RESULT of ACTION
@@ -357,7 +357,20 @@ class AlphaBetaPlayer(IsolationPlayer):
         self.time_left = time_left
 
         # TODO: finish this function!
-        raise NotImplementedError
+        # Initialize the best move so that this function returns something
+        # in case the search fails due to timeout
+        best_move = (-1, -1)
+
+        try:
+            # The try/except block will automatically catch the exception
+            # raised when the timer is about to expire.
+            return self.alphabeta(game, self.search_depth)
+
+        except SearchTimeout:
+            pass  # Handle any actions required after timeout as needed
+
+        # Return the best move from the last completed search iteration
+        return best_move
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
         """Implement depth-limited minimax search with alpha-beta pruning as
@@ -409,21 +422,21 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         # TODO: finish this function!
         # raise NotImplementedError
-        legal_moves = game.get_legal_moves()
-        best_move = (-1,-1)
+        legal_moves = game.get_legal_moves()  # obtain list of all available moves on the board
+        best_move = (-1,-1)  # initialise best move in case of error
+        #best_score = -math.inf  # abstraction assignment of infinity
 
         for m in legal_moves:
             new_state = game.forecast_move(m)
-            score = new_state # will have to implement min, then test alpha and beta
-            best_score = -math.inf
-            #if score > best_score:
-                #best_move = m
-                #best_score = score
-        return m
+            score = self.max_value(new_state, depth - 1, alpha, beta)  # will have to implement min, then test alpha and beta
+            if score > alpha:
+                best_move = m
+                alpha = score
+        return best_move
 
     def max_value(self, game, depth, alpha, beta):
         """
-        Helper function for calculating the upper boundary, alpha to use for pruning
+        Helper function for calculating the upper boundary, beta used for pruning
         """
         if self.time_left() < self.TIMER_THRESHOLD:  # Timeout check
             raise SearchTimeout()
@@ -431,21 +444,22 @@ class AlphaBetaPlayer(IsolationPlayer):
         if game.is_loser(self) or game.is_winner(self) or depth == 0:  # Terminal test, checks base cases
             return self.score(game,self)  # returns the score, UTILITY of the current state
 
-        legal_moves = game.get_legal_moves()
-        best_score = -math.inf
+        legal_moves = game.get_legal_moves()  # obtain all the available moves on the board
+        best_score = -math.inf  # abstraction assignment of neg. infinity
 
-        for m in legal_moves:
+        for m in legal_moves:  # iterate through available moves - ACTIONS available to the state
             new_state = game.forecast_move(m)
-            best_score = m  # recursive call to min - using newstate, alpha and beta
-            if best_score >= beta:
-                return best_score
-            else:
-                alpha = max(alpha,best_score)
-        return best_score
+            # for each move - ACTION, create the outcome of that move - RESULT of each ACTION resulting in a new state
+            score = self.min_value(new_state, depth - 1, alpha, beta)  # recursive call to min - using new state, alpha and beta
+            best_score = max(best_score, score)  # calculate max between best_score and score
+            if best_score >= beta:  # check if best score is greater than or equal to beta
+                return best_score  # return best score
+            alpha = max(alpha, best_score)  # calculate max between alpha and best_score
+        return best_score  # propagate max and return its value
 
     def min_value(self, game, depth, alpha, beta):
         """
-        Helper function for calculating the lower boundary, alpha to use for pruning
+        Helper function for calculating the lower boundary, alpha used for pruning
         """
         if self.time_left() < self.TIMER_THRESHOLD:  # Timeout check
             raise SearchTimeout()
@@ -453,19 +467,15 @@ class AlphaBetaPlayer(IsolationPlayer):
         if game.is_loser(self) or game.is_winner(self) or depth == 0:  # Terminal test, checks base cases
             return self.score(game,self)  # returns the score, UTILITY of the current state
 
-        legal_moves = game.get_legal_moves()
-        best_score = -math.inf
+        legal_moves = game.get_legal_moves()  # obtain all the available moves on the board
+        best_score = math.inf  # abstraction assignment of infinity
 
-        for m in legal_moves:
+        for m in legal_moves:  # iterate through available moves - ACTIONS available to the state
             new_state = game.forecast_move(m)
-            best_score = m  # recursive call to min - using newstate, alpha and beta
-            if best_score <= alpha:
-                return best_score
-            else:
-                beta = min(beta,best_score)
-        return best_score
-
-
-
-
-
+            # for each move - ACTION, create the outcome of that move - RESULT of each ACTION resulting in a new state
+            score = self.max_value(new_state, depth - 1, alpha, beta)  # recursive call to max - using new state, alpha and beta
+            best_score = min(best_score, score)  # calculate min between best_score and score
+            if best_score <= alpha:  # check if best score is less than or equal to alpha
+                return best_score  # return best score
+            beta = min(beta, best_score)  # calculate min between alpha and best_score
+        return best_score  # propagate min and return its value
