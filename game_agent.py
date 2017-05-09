@@ -360,17 +360,26 @@ class AlphaBetaPlayer(IsolationPlayer):
         # Initialize the best move so that this function returns something
         # in case the search fails due to timeout
         best_move = (-1, -1)
+        # The try/except block will automatically catch the exception# raised when the timer is about to expire.
+        # Implementation of Iterative Deepening Search
 
         try:
-            # The try/except block will automatically catch the exception
-            # raised when the timer is about to expire.
-            return self.alphabeta(game, self.search_depth)
+            depth = 0  # initialisation of depth
+            cutoff = 4
+            while game.is_loser(self) is not True or game.is_winner(self) is not True:
+                # runs along as game is still active
+                depth += 1
+                best_move = self.alphabeta(game, depth)
+                if depth != cutoff:
+                    return best_move
+            return best_move
 
         except SearchTimeout:
             pass  # Handle any actions required after timeout as needed
+            # Failure
 
         # Return the best move from the last completed search iteration
-        return best_move
+        return best_move  # Solution
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
         """Implement depth-limited minimax search with alpha-beta pruning as
@@ -423,7 +432,7 @@ class AlphaBetaPlayer(IsolationPlayer):
         # TODO: finish this function!
         # raise NotImplementedError
         legal_moves = game.get_legal_moves()  # obtain list of all available moves on the board
-        best_move = (-1,-1)  # initialise best move in case of error
+        best_move = (-1, -1)  # initialise best move in case of error
         best_score = -math.inf  # abstraction assignment of infinity
 
         for m in legal_moves:  # iterate through all moves available to the board - ACTIONS
@@ -434,8 +443,8 @@ class AlphaBetaPlayer(IsolationPlayer):
                 best_score = score  # update best score to current state's score
             if best_score >= beta:  # check best move against lower bound
                 return m  # return move
-            alpha = max(alpha,best_score)  # calculate max between alpha and best score, work out higher bound for current state
-        return best_move # return best move for player
+            alpha = max(alpha, best_score)  # calculate max between alpha and best score, work out higher bound for current state
+        return best_move  # return best move for player
 
     def max_value(self, game, depth, alpha, beta):
         """
