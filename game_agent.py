@@ -424,15 +424,18 @@ class AlphaBetaPlayer(IsolationPlayer):
         # raise NotImplementedError
         legal_moves = game.get_legal_moves()  # obtain list of all available moves on the board
         best_move = (-1,-1)  # initialise best move in case of error
-        #best_score = -math.inf  # abstraction assignment of infinity
+        best_score = -math.inf  # abstraction assignment of infinity
 
-        for m in legal_moves:
-            new_state = game.forecast_move(m)
-            score = self.max_value(new_state, depth - 1, alpha, beta)  # will have to implement min, then test alpha and beta
-            if score > alpha:
-                best_move = m
-                alpha = score
-        return best_move
+        for m in legal_moves:  # iterate through all moves available to the board - ACTIONS
+            new_state = game.forecast_move(m)  # capture new game state - RESULT for each move - ACTION
+            score = self.min_value(new_state, depth - 1, alpha, beta)  # recursive call to min_value to test new state along with alpha and beta
+            if score > best_score:  # check to see if score of move is better than current best score
+                best_move = m  # update best move to the current move
+                best_score = score  # update best score to current state's score
+            if best_score >= beta:  # check best move against lower bound
+                return m  # return move
+            alpha = max(alpha,best_score)  # calculate max between alpha and best score, work out higher bound for current state
+        return best_move # return best move for player
 
     def max_value(self, game, depth, alpha, beta):
         """
