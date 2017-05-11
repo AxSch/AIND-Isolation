@@ -36,20 +36,32 @@ def custom_score(game, player):
     """
     # TODO: finish this function!
     if game.is_winner(player): # check to see if player is in state winner
-        print("You win!")
+        #print("You win!")
         return math.inf # abstraction of score, +inf equates to a win
     elif game.is_loser(player):
-        print("You lose!")
+        #print("You lose!")
         return -math.inf # abstraction of score, -inf equates to a loss
 
-    opponent = game.get_opponent(player) # get the current opponent of the player
-    opp_moves = len(game.get_legal_moves(opponent)) # number of legal moves that opponent can do
+    # Opponent
+    opponent = game.get_opponent(player)
 
-    my_moves = len(game.get_legal_moves(player)) # number of moves available to player
+    # Remaining spaces left on the board
+    rem_spaces = len(game.get_blank_spaces())
 
-    result_moves = float(my_moves - opp_moves) # amount of moves available whilst reducing the opponents choice
+    # number of agent's available moves
+    no_moves = len(game.get_legal_moves(player))
 
-    return result_moves
+    # number of opponent's available moves
+    opp_moves = len(game.get_legal_moves(opponent))
+
+    # evaluation of board "goodness"
+    # using moves available to both players
+    # Idea is player chooses moves with scores that maximise whilst minimizing
+    # evaluate board states and positions as scores
+    board_score = no_moves - opp_moves
+    score = board_score/rem_spaces
+
+    return float(score)
 
 
 def custom_score_2(game, player):
@@ -75,30 +87,40 @@ def custom_score_2(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    if game.is_winner(player): # check to see if player is in state winner
-        print("You win!")
-        return math.inf  # abstraction of score, +inf equates to a win
-    elif game.is_loser(player):
-        print("You lose!")
-        return -math.inf  # abstraction of score, -inf equates to a loss
+    if game.is_loser(player):
+        #print("You lose!")
+        return -math.inf
+    if game.is_winner(player):
+        #print("You win")
+        return math.inf
 
-    empty_spaces = len(game.get_blank_spaces())  # gets the number of empty spaces on the board
+    # center
+    width = game.width / 2
+    height = game.height / 2
 
-    legal_moves = len(game.get_legal_moves(player))  # no. of legal moves available to player
-    my_longestPath = empty_spaces - legal_moves
-    # returns the longest path for the player
+    # Opponent
+    opponent = game.get_opponent(player)
+    opp_y_coord, opp_x_coord = game.get_player_location(opponent)
+    opp_x_eval = (width - float(opp_x_coord)) ** 2
+    opp_y_eval = (height - float(opp_y_coord)) ** 2
+    opp_center_eval = float(opp_x_eval + opp_y_eval)
 
-    opponent = game.get_opponent(player)  # get current opponent of player
-    legal_opp_moves = len(game.get_legal_moves(opponent))  # no. of legal moves available to the opponent
-    opp_longestPath = empty_spaces - legal_opp_moves
-    # returns the longest path for the opponent
+    # Remaining spaces left on the board
+    rem_spaces = len(game.get_blank_spaces())
 
+    # number of agent's available moves
+    no_moves = len(game.get_legal_moves(player))
 
-    if my_longestPath > opp_longestPath:
-        # check to see if player's area is larger than the opponent's
-        return float(my_longestPath)  # if true then return the length
-    else:
-        return float(0)
+    # number of opponent's available moves
+    opp_moves = len(game.get_legal_moves(opponent))
+
+    # evaluation of board "goodness"
+    # using moves available to both players
+    # Idea is player chooses moves with scores that maximise whilst minimizing
+    # evaluate board states and positions as scores
+    opp_score = opp_moves * 2 - opp_center_eval
+    score = no_moves - opp_score/rem_spaces
+    return float(score)
 
 
 def custom_score_3(game, player):
@@ -125,24 +147,38 @@ def custom_score_3(game, player):
     """
     # TODO: finish this function!
     if game.is_winner(player):  # check to see if player is in state winner
-        print("You win!")
+        #print("You win!")
         return math.inf  # abstraction of score, +inf equates to a win
     elif game.is_loser(player):
-        print("You lose!")
+        #print("You lose!")
         return -math.inf  # abstraction of score, -inf equates to a loss
 
-    remaining_spaces = len(game.get_blank_spaces())  # gets the number of remaining spaces on the board
-    opponent = game.get_opponent(player)  # get current opponent of player
+    # center
+    width = game.width / 2
+    height = game.height / 2
 
-    legal_moves = len(game.get_legal_moves(player))  # no. of legal moves available to player
-    legal_opp_moves = len(game.get_legal_moves(opponent))  # no. of legal moves available to the opponent
+    # Opponent
+    opponent = game.get_opponent(player)
+    opp_y_coord, opp_x_coord = game.get_player_location(opponent)
+    opp_x_eval = (width - float(opp_x_coord)) ** 2
+    opp_y_eval = (height - float(opp_y_coord)) ** 2
+    opp_center_eval = float(opp_x_eval + opp_y_eval)
 
-    my_remaining_spaces = legal_moves * 2 - legal_opp_moves
-    # doubles the agents moves, giving a higher return on amount of moves that should aggressively maximise their score
-    # but also reduces the opponent's score
-    result_moves = my_remaining_spaces/remaining_spaces # uses the length of the game to work out no. of best moves
+    # Remaining spaces left on the board
+    rem_spaces = len(game.get_blank_spaces())
 
-    return float(result_moves)
+    # number of agent's available moves
+    no_moves = len(game.get_legal_moves(player))
+
+    # number of opponent's available moves
+    opp_moves = len(game.get_legal_moves(opponent))
+
+    # evaluation of board "goodness"
+    # using moves available to both players
+    # Idea is player chooses moves with scores that maximise whilst minimizing
+    # evaluate board states and positions as scores
+    score = no_moves * 2 - opp_center_eval
+    return float(score)
 
 
 class IsolationPlayer:
