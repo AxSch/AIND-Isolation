@@ -159,10 +159,10 @@ def custom_score_3(game, player):
 
     # Opponent
     opponent = game.get_opponent(player)
-    opp_y_coord, opp_x_coord = game.get_player_location(opponent)
-    opp_x_eval = (width - float(opp_x_coord)) ** 2
-    opp_y_eval = (height - float(opp_y_coord)) ** 2
-    opp_center_eval = float(opp_x_eval + opp_y_eval)
+    y_coord, x_coord = game.get_player_location(player)
+    x_eval = (width - float(x_coord)) ** 2
+    y_eval = (height - float(y_coord)) ** 2
+    center_eval = float(x_eval + y_eval)
 
     # Remaining spaces left on the board
     rem_spaces = len(game.get_blank_spaces())
@@ -177,7 +177,8 @@ def custom_score_3(game, player):
     # using moves available to both players
     # Idea is player chooses moves with scores that maximise whilst minimizing
     # evaluate board states and positions as scores
-    score = no_moves * 2 - opp_center_eval
+    opp_score = opp_moves - center_eval
+    score = no_moves - opp_score
     return float(score)
 
 
